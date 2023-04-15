@@ -18,7 +18,7 @@ export class TraceExplorerOpenedTracesViewProvider implements vscode.WebviewView
 	private _view?: vscode.WebviewView;
 	private _disposables: vscode.Disposable[] = [];
 	private _selectedExperiment: Experiment | undefined;
-	private numOfExperimentsOpened = 0;
+	// private numOfExperimentsOpened = 0;
 
    	constructor(
 		private readonly _extensionUri: vscode.Uri,
@@ -104,13 +104,9 @@ export class TraceExplorerOpenedTracesViewProvider implements vscode.WebviewView
 	            }
 	            return;
 	        case 'updateOpenedTraces':
-	            if (message.numberOfOpenedTraces > 0 && this.numOfExperimentsOpened === 0) {
-	                console.log('opened-traces-webview-provider updateOpenedTraces setVisible True: '+message.numberOfOpenedTraces);
-	                this.numOfExperimentsOpened = message.numberOfOpenedTraces;
+	            if (message.numberOfOpenedTraces > 0) {
 	                vscode.commands.executeCommand('setContext', 'ext:isVisible', true);
-	            } else if (message.numberOfOpenedTraces === 0 && this.numOfExperimentsOpened > 0){
-	                console.log('opened-traces-webview-provider updateOpenedTraces setVisible False: '+message.numberOfOpenedTraces);
-	                this.numOfExperimentsOpened = message.numberOfOpenedTraces;
+	            } else if (message.numberOfOpenedTraces === 0){
 	                vscode.commands.executeCommand('setContext', 'ext:isVisible', false);
 	            }
 	            return;
