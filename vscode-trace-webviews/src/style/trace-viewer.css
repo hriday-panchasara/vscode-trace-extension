@@ -35,4 +35,6 @@
     --theia-secondaryButton-foreground: var(--vscode-button-secondaryForeground);
     --theia-secondaryButton-background: var(--vscode-button-secondaryBackground);
     --theia-sideBar-foreground: var(--vscode-sideBarTitle-foreground);
+    --theia-button-background: var(--vscode-button-background);
+    --theia-button-foreground: var(--vscode-button-foreground);
 }

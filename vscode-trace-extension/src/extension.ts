@@ -8,7 +8,6 @@ import { fileHandler, openOverviewHandler, resetZoomHandler } from './trace-expl
 import { updateTspClient } from './utils/tspClient';
 
 export function activate(context: vscode.ExtensionContext): void {
-
     const tracesProvider = new TraceExplorerOpenedTracesViewProvider(context.extensionUri);
     context.subscriptions.push(
         vscode.window.registerWebviewViewProvider(TraceExplorerOpenedTracesViewProvider.viewType, tracesProvider));
@@ -55,6 +54,4 @@ export function activate(context: vscode.ExtensionContext): void {
     context.subscriptions.push(vscode.commands.registerCommand('openedTraces.openTraceFolder', () => {
         fileOpenHandler(context, undefined);
     }));
-
-    vscode.commands.executeCommand('setContext', 'ext:isVisible', true);
 }

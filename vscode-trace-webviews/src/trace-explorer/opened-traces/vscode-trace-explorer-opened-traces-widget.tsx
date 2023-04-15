@@ -22,6 +22,7 @@ const JSONBig = JSONBigConfig({
 interface OpenedTracesAppState {
   tspClientProvider: ITspClientProvider | undefined;
   experimentsOpened: boolean;
+  loading: boolean;
 }
 
 const MENU_ID = 'traceExplorer.openedTraces.menuId';
@@ -29,10 +30,6 @@ const MENU_ID = 'traceExplorer.openedTraces.menuId';
 class TraceExplorerOpenedTraces extends React.Component<{}, OpenedTracesAppState>  {
   private _signalHandler: VsCodeMessageManager;
   private _experimentManager: ExperimentManager;
-
-  compState = {
-      loading: false
-  };
 
   static ID = 'trace-explorer-opened-traces-widget';
   static LABEL = 'Opened Traces';
@@ -45,7 +42,8 @@ class TraceExplorerOpenedTraces extends React.Component<{}, OpenedTracesAppState
       super(props);
       this.state = {
           tspClientProvider: undefined,
-          experimentsOpened: true
+          experimentsOpened: true,
+          loading: false
       };
       this._signalHandler = new VsCodeMessageManager();
       window.addEventListener('message', event => {
@@ -143,7 +141,6 @@ class TraceExplorerOpenedTraces extends React.Component<{}, OpenedTracesAppState
   }
 
   public render(): React.ReactNode {
-      const { loading } = this.compState;
       return ( this.state.experimentsOpened ? <><div>
           {this.state.tspClientProvider && <ReactOpenTracesWidget
               id={TraceExplorerOpenedTraces.ID}
@@ -161,7 +158,7 @@ class TraceExplorerOpenedTraces extends React.Component<{}, OpenedTracesAppState
       </Menu>
       </> :
           <ReactExplorerPlaceholderWidget
-              loading={loading}
+              loading={this.state.loading}
               handleOpenTrace={this.handleOpenTrace}
           ></ReactExplorerPlaceholderWidget>
       );
@@ -170,12 +167,10 @@ class TraceExplorerOpenedTraces extends React.Component<{}, OpenedTracesAppState
   protected handleOpenTrace = async (): Promise<void> => this.doHandleOpenTrace();
 
   private async doHandleOpenTrace() {
-      this.compState.loading = true;
-      this.forceUpdate();
+      this.setState({loading: true});
       console.log('openTrace clicked in placeholder view');
       this._signalHandler.openTrace();
-      this.compState.loading = false;
-      this.forceUpdate();
+      this.setState({loading: false});
   }
 
   protected handleItemClick = (args: ItemParams): void => {
