@@ -35,7 +35,6 @@ class TraceExplorerOpenedTraces extends React.Component<{}, OpenedTracesAppState
   static LABEL = 'Opened Traces';
 
   private _onExperimentSelected = (openedExperiment: Experiment | undefined): void => this.doHandleExperimentSelectedSignal(openedExperiment);
-  private _onExperimentDeleted = (deletedExperiment: Experiment): void => this.doHandleExperimentDeletedSignal(deletedExperiment);
   protected onUpdateSignal = (payload: OpenedTracesUpdatedSignalPayload): void => this.doHandleOpenedTracesChanged(payload);
 
   constructor(props: {}) {
@@ -88,7 +87,6 @@ class TraceExplorerOpenedTraces extends React.Component<{}, OpenedTracesAppState
       // this.onOutputRemoved = this.onOutputRemoved.bind(this);
       signalManager().on(Signals.EXPERIMENT_SELECTED, this._onExperimentSelected);
       signalManager().on(Signals.OPENED_TRACES_UPDATED, this.onUpdateSignal);
-      signalManager().on(Signals.EXPERIMENT_DELETED, this._onExperimentDeleted);
   }
 
   componentDidMount(): void {
@@ -98,17 +96,13 @@ class TraceExplorerOpenedTraces extends React.Component<{}, OpenedTracesAppState
   componentWillUnmount(): void {
       signalManager().off(Signals.EXPERIMENT_SELECTED, this._onExperimentSelected);
       signalManager().off(Signals.OPENED_TRACES_UPDATED, this.onUpdateSignal);
-      signalManager().off(Signals.EXPERIMENT_DELETED, () => console.log('vscode-trace-explorer-opened-traces-widget EXP_DELETED'));
   }
 
   protected doHandleOpenedTracesChanged(payload: OpenedTracesUpdatedSignalPayload): void {
-      console.log('doHandleOpenedTracesChanged: '+payload.getNumberOfOpenedTraces());
       this._signalHandler.updateOpenedTraces(payload.getNumberOfOpenedTraces());
-      if (!this.state.experimentsOpened && payload.getNumberOfOpenedTraces()>0) {
-          console.log('doHandleOpenedTracesChanged setState');
+      if (payload.getNumberOfOpenedTraces()>0) {
           this.setState({experimentsOpened: true});
-      } else if (this.state.experimentsOpened && payload.getNumberOfOpenedTraces()===0){
-          console.log('doHandleOpenedTracesChanged setState');
+      } else if (payload.getNumberOfOpenedTraces()===0){
           this.setState({experimentsOpened: false});
       }
   }
@@ -130,14 +124,7 @@ class TraceExplorerOpenedTraces extends React.Component<{}, OpenedTracesAppState
   }
 
   protected doHandleExperimentSelectedSignal(experiment: Experiment | undefined): void {
-      console.log('opened-traces-widget doHandleExperimentSelectedSignal');
       this._signalHandler.experimentSelected(experiment);
-  }
-
-  protected doHandleExperimentDeletedSignal(experiment: Experiment): void {
-      console.log('opened-traces-widget doHandleExperimentDeletedSignal');
-      console.log(experiment.name);
-      //   this._signalHandler.deleteTrace(experiment);
   }
 
   public render(): React.ReactNode {
@@ -168,7 +155,6 @@ class TraceExplorerOpenedTraces extends React.Component<{}, OpenedTracesAppState
 
   private async doHandleOpenTrace() {
       this.setState({loading: true});
-      console.log('openTrace clicked in placeholder view');
       this._signalHandler.openTrace();
       this.setState({loading: false});
   }

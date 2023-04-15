@@ -105,13 +105,12 @@ export class TraceExplorerOpenedTracesViewProvider implements vscode.WebviewView
 	            return;
 	        case 'updateOpenedTraces':
 	            if (message.numberOfOpenedTraces > 0) {
-	                vscode.commands.executeCommand('setContext', 'ext:isVisible', true);
+	                vscode.commands.executeCommand('setContext', 'trace-explorer.noExperiments', false);
 	            } else if (message.numberOfOpenedTraces === 0){
-	                vscode.commands.executeCommand('setContext', 'ext:isVisible', false);
+	                vscode.commands.executeCommand('setContext', 'trace-explorer.noExperiments', true);
 	            }
 	            return;
 	        case 'openTrace':
-	            console.log('opened-traces-webview-provider message recieved openTrace');
 	            vscode.commands.executeCommand('openedTraces.openTraceFolder');
 	            return;
 	        case 'experimentSelected': {

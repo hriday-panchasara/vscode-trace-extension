@@ -68,13 +68,13 @@
           "type": "webview",
           "id": "traceExplorer.availableViews",
           "name": "Views",
-          "when": "ext:isVisible"
+          "when": "!trace-explorer.noExperiments"
         },
         {
           "type": "webview",
           "id": "traceExplorer.itemPropertiesView",
           "name": "Item Properties",
-          "when": "ext:isVisible"
+          "when": "!trace-explorer.noExperiments"
         }
       ]
     },
