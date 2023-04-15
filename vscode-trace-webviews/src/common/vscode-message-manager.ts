@@ -43,6 +43,16 @@ export class VsCodeMessageManager extends Messages.MessageManager {
     /**************************************************************************
      * Trace Explorer React APP
      *************************************************************************/
+    openTrace(): void {
+        console.log('post message openTrace');
+        vscode.postMessage({command: 'openTrace'});
+    }
+
+    updateOpenedTraces(numberOfOpenedTraces: number): void {
+        console.log('calling postMessage for updateOpenedTraces');
+        vscode.postMessage({command: 'updateOpenedTraces', numberOfOpenedTraces});
+    }
+
     reOpenTrace(experiment: Experiment): void {
         const wrapper: string = JSONBig.stringify(experiment);
         vscode.postMessage({command: 'reopenTrace', data: {wrapper}});

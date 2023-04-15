@@ -13,12 +13,15 @@ import '../../style/react-contextify.css';
 import { ExperimentManager } from 'traceviewer-base/lib/experiment-manager';
 import { convertSignalExperiment } from 'vscode-trace-webviews/src/common/vscode-signal-converter';
 import JSONBigConfig from 'json-bigint';
+import { OpenedTracesUpdatedSignalPayload } from 'traceviewer-base/lib/signals/opened-traces-updated-signal-payload';
+import { ReactExplorerPlaceholderWidget } from 'traceviewer-react-components/lib/trace-explorer/trace-explorer-placeholder-widget';
 const JSONBig = JSONBigConfig({
     useNativeBigInt: true,
 });
 
 interface OpenedTracesAppState {
   tspClientProvider: ITspClientProvider | undefined;
+  experimentsOpened: boolean;
 }
 
 const MENU_ID = 'traceExplorer.openedTraces.menuId';
@@ -27,15 +30,22 @@ class TraceExplorerOpenedTraces extends React.Component<{}, OpenedTracesAppState
   private _signalHandler: VsCodeMessageManager;
   private _experimentManager: ExperimentManager;
 
+  compState = {
+      loading: false
+  };
+
   static ID = 'trace-explorer-opened-traces-widget';
   static LABEL = 'Opened Traces';
 
   private _onExperimentSelected = (openedExperiment: Experiment | undefined): void => this.doHandleExperimentSelectedSignal(openedExperiment);
+  private _onExperimentDeleted = (deletedExperiment: Experiment): void => this.doHandleExperimentDeletedSignal(deletedExperiment);
+  protected onUpdateSignal = (payload: OpenedTracesUpdatedSignalPayload): void => this.doHandleOpenedTracesChanged(payload);
 
   constructor(props: {}) {
       super(props);
       this.state = {
           tspClientProvider: undefined,
+          experimentsOpened: true
       };
       this._signalHandler = new VsCodeMessageManager();
       window.addEventListener('message', event => {
@@ -66,14 +76,21 @@ class TraceExplorerOpenedTraces extends React.Component<{}, OpenedTracesAppState
               }
               break;
           case 'experimentOpened':
+              console.log('opened-traces-widget experimentOpened message recieved');
               if (message.data) {
                   const experiment = convertSignalExperiment(JSONBig.parse(message.data));
                   signalManager().fireExperimentOpenedSignal(experiment);
+                  if (!this.state.experimentsOpened) {
+                      console.log('opened-traces-widget experimentOpened setState');
+                      this.setState({experimentsOpened: true});
+                  }
               }
           }
       });
       // this.onOutputRemoved = this.onOutputRemoved.bind(this);
       signalManager().on(Signals.EXPERIMENT_SELECTED, this._onExperimentSelected);
+      signalManager().on(Signals.OPENED_TRACES_UPDATED, this.onUpdateSignal);
+      signalManager().on(Signals.EXPERIMENT_DELETED, this._onExperimentDeleted);
   }
 
   componentDidMount(): void {
@@ -82,6 +99,20 @@ class TraceExplorerOpenedTraces extends React.Component<{}, OpenedTracesAppState
 
   componentWillUnmount(): void {
       signalManager().off(Signals.EXPERIMENT_SELECTED, this._onExperimentSelected);
+      signalManager().off(Signals.OPENED_TRACES_UPDATED, this.onUpdateSignal);
+      signalManager().off(Signals.EXPERIMENT_DELETED, () => console.log('vscode-trace-explorer-opened-traces-widget EXP_DELETED'));
+  }
+
+  protected doHandleOpenedTracesChanged(payload: OpenedTracesUpdatedSignalPayload): void {
+      console.log('doHandleOpenedTracesChanged: '+payload.getNumberOfOpenedTraces());
+      this._signalHandler.updateOpenedTraces(payload.getNumberOfOpenedTraces());
+      if (!this.state.experimentsOpened && payload.getNumberOfOpenedTraces()>0) {
+          console.log('doHandleOpenedTracesChanged setState');
+          this.setState({experimentsOpened: true});
+      } else if (this.state.experimentsOpened && payload.getNumberOfOpenedTraces()===0){
+          console.log('doHandleOpenedTracesChanged setState');
+          this.setState({experimentsOpened: false});
+      }
   }
 
   protected doHandleContextMenuEvent(event: React.MouseEvent<HTMLDivElement>, experiment: Experiment): void {
@@ -101,11 +132,19 @@ class TraceExplorerOpenedTraces extends React.Component<{}, OpenedTracesAppState
   }
 
   protected doHandleExperimentSelectedSignal(experiment: Experiment | undefined): void {
+      console.log('opened-traces-widget doHandleExperimentSelectedSignal');
       this._signalHandler.experimentSelected(experiment);
   }
 
+  protected doHandleExperimentDeletedSignal(experiment: Experiment): void {
+      console.log('opened-traces-widget doHandleExperimentDeletedSignal');
+      console.log(experiment.name);
+      //   this._signalHandler.deleteTrace(experiment);
+  }
+
   public render(): React.ReactNode {
-      return (<><div>
+      const { loading } = this.compState;
+      return ( this.state.experimentsOpened ? <><div>
           {this.state.tspClientProvider && <ReactOpenTracesWidget
               id={TraceExplorerOpenedTraces.ID}
               title={TraceExplorerOpenedTraces.LABEL}
@@ -120,8 +159,23 @@ class TraceExplorerOpenedTraces extends React.Component<{}, OpenedTracesAppState
           <Item id="close-id" onClick={this.handleItemClick}>Close Trace</Item>
           <Item id="remove-id" onClick={this.handleItemClick}>Remove Trace</Item>
       </Menu>
-      </>
+      </> :
+          <ReactExplorerPlaceholderWidget
+              loading={loading}
+              handleOpenTrace={this.handleOpenTrace}
+          ></ReactExplorerPlaceholderWidget>
       );
+  }
+
+  protected handleOpenTrace = async (): Promise<void> => this.doHandleOpenTrace();
+
+  private async doHandleOpenTrace() {
+      this.compState.loading = true;
+      this.forceUpdate();
+      console.log('openTrace clicked in placeholder view');
+      this._signalHandler.openTrace();
+      this.compState.loading = false;
+      this.forceUpdate();
   }
 
   protected handleItemClick = (args: ItemParams): void => {

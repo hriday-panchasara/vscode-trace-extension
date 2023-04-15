@@ -55,4 +55,6 @@ export function activate(context: vscode.ExtensionContext): void {
     context.subscriptions.push(vscode.commands.registerCommand('openedTraces.openTraceFolder', () => {
         fileOpenHandler(context, undefined);
     }));
+
+    vscode.commands.executeCommand('setContext', 'ext:isVisible', true);
 }
