@@ -103,13 +103,6 @@ export class TraceExplorerOpenedTracesViewProvider implements vscode.WebviewView
 	                signalManager().fireExperimentSelectedSignal(undefined);
 	            }
 	            return;
-	        case 'updateOpenedTraces':
-	            if (message.numberOfOpenedTraces > 0) {
-	                vscode.commands.executeCommand('setContext', 'trace-explorer.noExperiments', false);
-	            } else if (message.numberOfOpenedTraces === 0){
-	                vscode.commands.executeCommand('setContext', 'trace-explorer.noExperiments', true);
-	            }
-	            return;
 	        case 'openTrace':
 	            vscode.commands.executeCommand('openedTraces.openTraceFolder');
 	            return;
