@@ -31,10 +31,50 @@
       },
       {
         "command": "outputs.openOverview",
-        "title": "Open Overview View",
+        "title": "Show trace overview",
         "icon": {
-          "light": "assets/media/graph-line.svg",
+          "light": "assets/media/graph-line-light.svg",
           "dark": "assets/media/graph-line.svg"
+        }
+      },
+      {
+        "command": "outputs.undo",
+        "title": "Undo",
+        "icon": {
+          "light": "assets/media/arrow-rotate-left-light.svg",
+          "dark": "assets/media/arrow-rotate-left.svg"
+        }
+      },
+      {
+        "command": "outputs.redo",
+        "title": "Redo",
+        "icon": {
+          "light": "assets/media/arrow-rotate-right-light.svg",
+          "dark": "assets/media/arrow-rotate-right.svg"
+        }
+      },
+      {
+        "command": "outputs.shortcuts",
+        "title": "Keyboard Shortcuts",
+        "icon": {
+          "light": "assets/media/circle-info-light.svg",
+          "dark": "assets/media/circle-info.svg"
+        }
+      },
+      {
+        "command": "outputs.zoomIn",
+        "title": "Zoom In",
+        "icon": {
+          "light": "assets/media/square-plus-light.svg",
+          "dark": "assets/media/square-plus.svg"
+        }
+      },
+      {
+        "command": "outputs.zoomOut",
+        "title": "Zoom Out",
+        "icon": {
+          "light": "assets/media/square-minus-light.svg",
+          "dark": "assets/media/square-minus.svg"
         }
       },
       {
@@ -46,6 +86,18 @@
         "command": "openedTraces.openTraceFolder",
         "title": "Open Trace",
         "icon": "$(new-folder)"
+      },
+      {
+        "command": "openedTraces.contextMenu.open",
+        "title": "Open Trace"
+      },
+      {
+        "command": "openedTraces.contextMenu.close",
+        "title": "Close Trace"
+      },
+      {
+        "command": "openedTraces.contextMenu.remove",
+        "title": "Remove Trace"
       }
     ],
     "viewsContainers": {
@@ -114,6 +166,45 @@
           "when": "activeWebviewPanelId == 'react'",
           "command": "outputs.openOverview",
           "group": "navigation@2"
+        },
+        {
+          "when": "activeWebviewPanelId == 'react'",
+          "command": "outputs.undo",
+          "group": "navigation@3"
+        },
+        {
+          "when": "activeWebviewPanelId == 'react'",
+          "command": "outputs.redo",
+          "group": "navigation@4"
+        },
+        {
+          "when": "activeWebviewPanelId == 'react'",
+          "command": "outputs.shortcuts",
+          "group": "navigation@5"
+        },
+        {
+          "when": "activeWebviewPanelId == 'react'",
+          "command": "outputs.zoomIn",
+          "group": "navigation@6"
+        },
+        {
+          "when": "activeWebviewPanelId == 'react'",
+          "command": "outputs.zoomOut",
+          "group": "navigation@7"
+        }
+      ],
+      "webview/context": [
+        {
+          "command": "openedTraces.contextMenu.open",
+          "when": "webviewId == traceExplorer.openedTracesView"
+        },
+        {
+          "command": "openedTraces.contextMenu.close",
+          "when": "webviewId == traceExplorer.openedTracesView"
+        },
+        {
+          "command": "openedTraces.contextMenu.remove",
+          "when": "webviewId == traceExplorer.openedTracesView"
         }
       ]
     },

@@ -77,6 +77,18 @@ export class TraceViewerPanel {
 		TraceViewerPanel.currentPanel?.resetZoom();
 	}
 
+	public static undoRedoOnCurrent(undo: boolean): void {
+		TraceViewerPanel.currentPanel?.undoRedo(undo);
+	}
+
+	public static zoomOnCurrent(hasZoomedIn: boolean): void {
+		TraceViewerPanel.currentPanel?.updateZoom(hasZoomedIn);
+	}
+
+	public static openShortcutsOnCurrent(): void {
+		TraceViewerPanel.currentPanel?.openKeyboardShortcuts();
+	}
+
 	private static async saveTraceCsv(csvData: string, defaultFileName: string) {
 	    const saveDialogOptions = {
 	        defaultUri: vscode.workspace.workspaceFolders
@@ -233,6 +245,22 @@ export class TraceViewerPanel {
 
 	resetZoom(): void {
 	    this._panel.webview.postMessage({ command: 'reset-zoom' });
+	}
+
+	undoRedo(undo: boolean): void {
+	    if (undo) {
+	        this._panel.webview.postMessage({ command: 'undo' });
+	    } else {
+	        this._panel.webview.postMessage({ command: 'redo' });
+	    }
+	}
+
+	updateZoom(hasZoomedIn: boolean): void {
+	    this._panel.webview.postMessage({ command: 'updateZoom', data: hasZoomedIn});
+	}
+
+	openKeyboardShortcuts(): void {
+	    this._panel.webview.postMessage({ command: 'openKeyboardShortcuts'});
 	}
 
 	loadTheme(): void {

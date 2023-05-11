@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { ReactOpenTracesWidget } from 'traceviewer-react-components/lib/trace-explorer/trace-explorer-opened-traces-widget';
 import { VsCodeMessageManager } from '../../common/vscode-message-manager';
-import { Menu, Item, useContextMenu, ItemParams } from 'react-contexify';
 import { TspClientProvider } from '../../common/tsp-client-provider-impl';
 import { ITspClientProvider } from 'traceviewer-base/lib/tsp-client-provider';
 import { Experiment } from 'tsp-typescript-client/lib/models/experiment';
@@ -20,8 +19,6 @@ const JSONBig = JSONBigConfig({
 interface OpenedTracesAppState {
   tspClientProvider: ITspClientProvider | undefined;
 }
-
-const MENU_ID = 'traceExplorer.openedTraces.menuId';
 
 class TraceExplorerOpenedTraces extends React.Component<{}, OpenedTracesAppState>  {
   private _signalHandler: VsCodeMessageManager;
@@ -100,15 +97,24 @@ class TraceExplorerOpenedTraces extends React.Component<{}, OpenedTracesAppState
   }
 
   protected doHandleContextMenuEvent(event: React.MouseEvent<HTMLDivElement>, experiment: Experiment): void {
-      const { show } = useContextMenu({
-          id: MENU_ID,
-      });
+      //   event.stopPropagation();
+      console.log(experiment.name);
+      //   const { show } = useContextMenu({
+      //       id: MENU_ID,
+      //   });
 
-      show(event, {
-          props: {
-              experiment: experiment,
-          }
+      //   show(event, {
+      //       props: {
+      //           experiment: experiment,
+      //       }
+      //   });
+      const evt = new MouseEvent('contextmenu', {
+          bubbles: false,
+          clientX: event.clientX,
+          clientY: event.clientY,
       });
+        event.target?.dispatchEvent(evt);
+        event.stopPropagation();
   }
 
   protected doHandleClickEvent(event: React.MouseEvent<HTMLDivElement>, experiment: Experiment): void {
@@ -130,34 +136,34 @@ class TraceExplorerOpenedTraces extends React.Component<{}, OpenedTracesAppState
           ></ReactOpenTracesWidget>
           }
       </div>
-      <Menu id={MENU_ID} theme={'dark'} animation={'fade'}>
+      {/* <Menu id={MENU_ID} theme={'dark'} animation={'fade'}>
           <Item id="open-id" onClick={this.handleItemClick}>Open Trace</Item>
           <Item id="close-id" onClick={this.handleItemClick}>Close Trace</Item>
           <Item id="remove-id" onClick={this.handleItemClick}>Remove Trace</Item>
-      </Menu>
+      </Menu> */}
       </>
       );
   }
 
-  protected handleItemClick = (args: ItemParams): void => {
-      switch (args.event.currentTarget.id) {
-      case 'open-id':
-          this._signalHandler.reOpenTrace(args.props.experiment as Experiment);
-          return;
-      case 'close-id':
-          this._signalHandler.closeTrace(args.props.experiment as Experiment);
-          return;
-      case 'remove-id':
-          this._signalHandler.deleteTrace(args.props.experiment as Experiment);
-          if (this._experimentManager) {
-              this._experimentManager.deleteExperiment((args.props.experiment as Experiment).UUID);
-          }
+    //   protected handleItemClick = (args: ItemParams): void => {
+    //       switch (args.event.currentTarget.id) {
+    //       case 'open-id':
+    //           this._signalHandler.reOpenTrace(args.props.experiment as Experiment);
+    //           return;
+    //       case 'close-id':
+    //           this._signalHandler.closeTrace(args.props.experiment as Experiment);
+    //           return;
+    //       case 'remove-id':
+    //           this._signalHandler.deleteTrace(args.props.experiment as Experiment);
+    //           if (this._experimentManager) {
+    //               this._experimentManager.deleteExperiment((args.props.experiment as Experiment).UUID);
+    //           }
 
-          return;
-      default:
-        // Do nothing
-      }
-  };
+//           return;
+//       default:
+//         // Do nothing
+//       }
+//   };
 }
 
 export default TraceExplorerOpenedTraces;

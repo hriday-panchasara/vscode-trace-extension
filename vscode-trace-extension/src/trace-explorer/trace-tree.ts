@@ -106,6 +106,18 @@ export const resetZoomHandler = () => (): void => {
     TraceViewerPanel.resetZoomOnCurrent();
 };
 
+export const undoRedoHandler = (undo: boolean): void => {
+    TraceViewerPanel.undoRedoOnCurrent(undo);
+};
+
+export const zoomHandler = (hasZoomedIn: boolean): void => {
+    TraceViewerPanel.zoomOnCurrent(hasZoomedIn);
+};
+
+export const shortcutsHandler = (): void => {
+    // TraceViewerPanel.openShortcutsOnCurrent();
+};
+
 const openDialog = async (): Promise<vscode.Uri | undefined> => {
     const props: vscode.OpenDialogOptions = {
         title: 'Open Trace',

@@ -4,7 +4,7 @@ import { AnalysisProvider } from './trace-explorer/analysis-tree';
 import { TraceExplorerItemPropertiesProvider } from './trace-explorer/properties/trace-explorer-properties-view-webview-provider';
 import { TraceExplorerAvailableViewsProvider } from './trace-explorer/available-views/trace-explorer-available-views-webview-provider';
 import { TraceExplorerOpenedTracesViewProvider } from './trace-explorer/opened-traces/trace-explorer-opened-traces-webview-provider';
-import { fileHandler, openOverviewHandler, resetZoomHandler } from './trace-explorer/trace-tree';
+import { fileHandler, openOverviewHandler, resetZoomHandler, undoRedoHandler, zoomHandler, shortcutsHandler } from './trace-explorer/trace-tree';
 import { TraceServerConnectionStatusService } from './utils/trace-server-status';
 import { updateTspClient } from './utils/tspClient';
 import { TraceExtensionLogger } from './utils/trace-extension-logger';
@@ -62,8 +62,32 @@ export function activate(context: vscode.ExtensionContext): void {
         overViewOpenHandler();
     }));
 
+    context.subscriptions.push(vscode.commands.registerCommand('outputs.undo', () => {
+        undoRedoHandler(true);
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('outputs.redo', () => {
+        undoRedoHandler(false);
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('outputs.shortcuts', () => {
+        shortcutsHandler();
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('outputs.zoomIn', () => {
+        zoomHandler(true);
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('outputs.zoomOut', () => {
+        zoomHandler(false);
+    }));
+
     context.subscriptions.push(vscode.commands.registerCommand('openedTraces.openTraceFolder', () => {
         fileOpenHandler(context, undefined);
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('openedTraces.contextMenu.open', () => {
+        console.log('openedTraces.contextMenu.open');
     }));
 }
 
